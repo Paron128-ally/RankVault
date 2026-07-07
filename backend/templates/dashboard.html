@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · RankVault{% endblock %}
+{% block content %}
+<div class="page-head">
+  <span class="eyebrow">Dashboard</span>
+  <h1>Welcome back, {{ student.name.split(' ')[0] if student and student.name else '' }}</h1>
+  <p class="desc">{{ student.centre if student and student.centre else '' }} · Here's where your preparation stands today.</p>
+</div>
+
+<div class="grid grid-3" style="margin-bottom:8px;">
+  <div class="card">
+    <div style="font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;">Syllabus covered</div>
+    <div style="font-family:var(--font-display);font-size:2.1rem;font-weight:700;color:var(--ink);margin-top:4px;">{{ stats.syllabusPct }}%</div>
+    <div class="progress-track" style="margin-top:10px;"><div class="progress-fill" data-width="{{ stats.syllabusPct if stats and stats.syllabusPct else 0 }}"></div></div>
+  </div>
+  <div class="card">
+    <div style="font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;">Average accuracy</div>
+    <div style="font-family:var(--font-display);font-size:2.1rem;font-weight:700;color:var(--verified);margin-top:4px;">{{ stats.avgAccuracy }}%</div>
+    <div style="font-size:.82rem;color:var(--muted);margin-top:10px;">Across {{ stats.chapterStats.values()|selectattr('status','ne','upcoming')|list|length }} active chapters</div>
+  </div>
+  <div class="card">
+    <div style="font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;">{% if last_attempt %}Last test score{% else %}Next test{% endif %}</div>
+    {% if last_attempt %}
+    <div style="font-family:var(--font-display);font-size:2.1rem;font-weight:700;color:var(--correction);margin-top:4px;">{{ last_attempt.score }}/{{ last_attempt.max_score }}</div>
+    <div style="font-size:.82rem;color:var(--muted);margin-top:10px;">{{ last_attempt.test_name }}</div>
+    {% else %}
+    <div style="font-family:var(--font-display);font-size:2.1rem;font-weight:700;color:var(--correction);margin-top:4px;">Available now</div>
+    <div style="font-size:.82rem;color:var(--muted);margin-top:10px;">{{ test_name }}</div>
+    {% endif %}
+  </div>
+</div>
+
+{% if in_progress %}
+<div class="section-title">Pick up where you left off</div>
+<div class="card" style="display:flex; gap:14px; align-items:center; margin-bottom:6px;">
+  <div style="width:64px;height:64px;border-radius:8px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;">▶</div>
+  <div style="flex:1; min-width:0;">
+    <div style="font-size:.7rem;font-family:var(--font-mono);color:var(--muted);text-transform:uppercase;">{{ in_progress.subject }} · {{ in_progress.chapter }}</div>
+    <div style="font-weight:600; margin:2px 0 8px;">{{ in_progress.title }}</div>
+    <div class="progress-track" style="margin-bottom:8px;"><div class="progress-fill" data-width="{{ in_progress.pct if in_progress and in_progress.pct else 0 }}" style="background:var(--ink);"></div></div>
+    <a href="{{ url_for('lectures') }}" class="btn btn-dark btn-sm">Resume lecture</a>
+  </div>
+</div>
+{% endif %}
+
+<div class="section-title">Needs attention</div>
+<table class="data-table" style="margin-bottom:10px;">
+  <thead><tr><th>Chapter</th><th>Subject</th><th>Accuracy</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for w in weak %}
+    <tr>
+      <td>{{ w.chapter }}</td><td>{{ w.subject }}</td>
+      <td><span style="color:var(--correction); font-weight:600;">{{ w.accuracy }}%</span></td>
+      <td><span class="tag tag-active">Active</span></td>
+      <td><a href="{{ url_for('packages') }}" class="btn btn-ghost btn-sm">Practice</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="section-title">Jump to a module</div>
+<div class="grid grid-3">
+  <a href="{{ url_for('test_engine') }}" class="card" style="display:block;">
+    <span class="tag tag-active" style="margin-bottom:10px;">Available now</span>
+    <h3 style="font-size:1.05rem;">{{ test_name }}</h3>
+    <p style="font-size:.85rem; color:var(--muted); margin-bottom:0;">NTA-pattern CBT interface, scored +4/−1, saved to your profile.</p>
+  </a>
+  <a href="{{ url_for('packages') }}" class="card" style="display:block;">
+    <span class="tag tag-new" style="margin-bottom:10px;">Updated</span>
+    <h3 style="font-size:1.05rem;">Study Packages</h3>
+    <p style="font-size:.85rem; color:var(--muted); margin-bottom:0;">Class 9–12 CPPs, workbooks and assignments, organised chapter by chapter.</p>
+  </a>
+  <a href="{{ url_for('myplan') }}" class="card" style="display:block;">
+    <span class="tag tag-upcoming" style="margin-bottom:10px;">Your plan</span>
+    <h3 style="font-size:1.05rem;">myPlan</h3>
+    <p style="font-size:.85rem; color:var(--muted); margin-bottom:0;">See your full syllabus map — what's active, expired, and your accuracy by chapter.</p>
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Lectures · RankVault{% endblock %}
+{% block extra_head %}
+<style>
+  .lecture-layout{display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;}
+  @media (max-width:980px){ .lecture-layout{grid-template-columns:1fr;} }
+  .player-frame{background:#0E1626; border-radius:12px; overflow:hidden; position:relative; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; user-select:none;}
+  .player-frame.live{background:linear-gradient(135deg,#1B2A4A,#0E1626);}
+  .player-frame iframe, .player-frame #youtube-player{position:absolute; inset:0; width:100%; height:100%; border:0; display:none; z-index:1;}
+  .watermark{position:absolute; color:rgba(255,255,255,.16); font-family:var(--font-mono); font-size:.72rem; pointer-events:none; white-space:nowrap; animation:drift 18s linear infinite;}
+  @keyframes drift{0%{top:10%; left:6%;} 25%{top:70%; left:55%;} 50%{top:20%; left:70%;} 75%{top:60%; left:12%;} 100%{top:10%; left:6%;}}
+  .play-btn{width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:var(--ink); cursor:pointer; border:none; z-index:2;}
+  .secure-banner{position:absolute; top:12px; left:14px; right:14px; z-index:2; font-family:var(--font-mono); font-size:.68rem; color:#C7CCDC; display:flex; align-items:center; gap:6px;}
+  .player-controls{background:var(--ink); padding:12px 16px; border-radius:0 0 12px 12px; display:flex; align-items:center; gap:12px; color:#fff; margin-top:-1px;}
+  .player-controls button{background:none; border:none; color:#fff; cursor:pointer; font-size:1.05rem;}
+  .scrub-track{flex:1; height:6px; background:rgba(255,255,255,.2); border-radius:4px; cursor:pointer; position:relative;}
+  .scrub-fill{position:absolute; top:0; left:0; height:100%; background:var(--correction); border-radius:4px;}
+  .time-label{font-family:var(--font-mono); font-size:.72rem; color:#C7CCDC; min-width:84px; text-align:right;}
+  .speed-btn{font-family:var(--font-mono); font-size:.72rem; border:1px solid rgba(255,255,255,.3); border-radius:5px; padding:3px 7px;}
+  .lec-list-item{display:flex; gap:10px; padding:12px; border-radius:8px; cursor:pointer; border:1px solid transparent; margin-bottom:6px;}
+  .lec-list-item:hover{background:#F2EDE0;}
+  .lec-list-item.active{background:#EFE9D9; border-color:var(--rule);}
+  .lec-thumb{width:54px; height:54px; border-radius:6px; background:var(--ink); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:.9rem;}
+  .lec-info .t{font-size:.84rem; font-weight:600; line-height:1.3;}
+  .lec-info .m{font-size:.72rem; color:var(--muted); margin-top:3px;}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-head">
+  <span class="eyebrow">Lectures</span>
+  <h1>Live &amp; recorded lectures</h1>
+  <p class="desc">Every classroom session, encrypted and tied to your enrollment — your watch position is saved to your profile.</p>
+</div>
+
+<div class="lecture-layout">
+  <div>
+    <div class="player-frame" id="player-frame">
+      <iframe id="youtube-player" title="Lecture video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div class="secure-banner"><span id="secure-text"></span></div>
+      <div class="watermark" id="watermark"></div>
+      <div id="live-message" style="display:none; color:#fff; text-align:center; z-index:2; font-family:var(--font-mono);">
+        <div style="font-size:1.4rem; margin-bottom:6px;">LIVE</div>
+        <div style="font-size:.85rem; color:#C7CCDC;" id="live-message-text"></div>
+      </div>
+      <button class="play-btn" id="play-btn" onclick="togglePlay()">▶</button>
+    </div>
+    <div class="player-controls" id="player-controls">
+      <button onclick="togglePlay()" id="ctrl-play">▶</button>
+      <span class="time-label" id="time-elapsed">0:00</span>
+      <div class="scrub-track" id="scrub-track" onclick="seek(event)"><div class="scrub-fill" id="scrub-fill" style="width:0%;"></div></div>
+      <span class="time-label" id="time-total">0:00</span>
+      <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap;">
+        <div>
+          <div style="font-family:var(--font-mono); font-size:.72rem; color:var(--muted); text-transform:uppercase;" id="lec-chapter"></div>
+          <h3 style="margin-top:4px;" id="lec-title"></h3>
+          <div style="font-size:.85rem; color:var(--muted);" id="lec-faculty"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="markWatched()">Mark as watched</button>
+      </div>
+      <p id="resume-note" style="margin-top:14px; font-size:.85rem; color:var(--verified); display:none;"></p>
+    </div>
+  </div>
+
+  <div>
+    <div class="tabs" id="subject-filter" style="margin-bottom:10px;"></div>
+    <div id="lecture-list" style="max-height:640px; overflow-y:auto; padding-right:4px;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script id="lectures-data" type="application/json">
+{
+  "lectures": {{ lectures|tojson if lectures else [] }},
+  "student_name": {{ (student.name if student else '')|tojson }},
+  "student_enrollment": {{ (student.enrollment if student else '')|tojson }}
+}
+</script>
+<script>
+  (function(){
+    const el = document.getElementById('lectures-data');
+    let data = {};
+    try{ data = JSON.parse(el && el.textContent || '{}'); }catch(e){ data = {}; }
+    window.LECTURES = data.lectures || [];
+    window.STUDENT_NAME = data.student_name || '';
+    window.STUDENT_ENROLLMENT = data.student_enrollment || '';
+  })();
+</script>
+<script src="{{ url_for('static', filename='lectures.js') }}"></script>
+{% endblock %}
