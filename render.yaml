@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: rankvault-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn api:app --bind 0.0.0.0:$PORT
+    plan: free
+    envVars:
+      - key: FRONTEND_ORIGIN
+        value: "*" # tighten to your Vercel URL once it exists, e.g. https://rankvault-web.vercel.app
