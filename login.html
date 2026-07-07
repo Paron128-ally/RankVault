@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in · RankVault</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<style>
+  body.login-body{
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:var(--paper); padding:30px 16px;
+  }
+  .login-wrap{display:grid; grid-template-columns:380px 1fr; gap:36px; max-width:980px; width:100%; align-items:start;}
+  @media (max-width:860px){ .login-wrap{grid-template-columns:1fr;} }
+  .login-card{background:var(--paper-card); border:1px solid var(--rule); border-radius:12px; padding:30px 28px;}
+  .brand-row{display:flex; align-items:baseline; gap:6px; font-family:var(--font-display); font-size:1.5rem; font-weight:700; color:var(--ink); margin-bottom:4px;}
+  .brand-row span{color:var(--correction);}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-family:var(--font-mono); font-size:.72rem; text-transform:uppercase; color:var(--muted); margin-bottom:6px; letter-spacing:.05em;}
+  .field input{
+    width:100%; padding:11px 13px; border:1px solid var(--rule); border-radius:7px;
+    font-family:var(--font-body); font-size:.92rem; background:#fff;
+  }
+  .field input:focus{outline:none; border-color:var(--ink);}
+  .demo-hint{font-size:.78rem; color:var(--muted); background:#F2EDE0; border-radius:7px; padding:10px 12px; margin-bottom:18px;}
+  .roster-card{background:var(--paper-card); border:1px solid var(--rule); border-radius:12px; padding:22px 24px;}
+  .roster-search{width:100%; padding:9px 12px; border:1px solid var(--rule); border-radius:7px; font-size:.85rem; margin-bottom:14px;}
+  .roster-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; max-height:430px; overflow-y:auto; padding-right:4px;}
+  @media (max-width:520px){ .roster-grid{grid-template-columns:1fr;} }
+  .roster-item{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border:1px solid var(--rule);
+    border-radius:8px; cursor:pointer; background:#fff; text-align:left;
+  }
+  .roster-item:hover{border-color:var(--ink); background:#F8F5EC;}
+  .avatar{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0; color:#fff; font-weight:700;
+    font-size:.72rem; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);
+  }
+  .roster-item .rn{font-size:.82rem; font-weight:600; line-height:1.2;}
+  .roster-item .rm{font-size:.7rem; color:var(--muted); font-family:var(--font-mono);}
+</style>
+</head>
+<body class="login-body">
+
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="brand-row">Ascent<span>Prep</span></div>
+    <p class="desc" style="margin-bottom:22px;">Log in with your enrollment ID to continue.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="card" style="border-color:var(--correction); background:var(--correction-soft); color:var(--correction); padding:12px 14px; margin-bottom:18px; font-size:.85rem;">
+          {% for m in messages %}{{ m }}{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="field">
+        <label for="enrollment">Enrollment ID</label>
+        <input type="text" id="enrollment" name="enrollment" placeholder="AP24-1182" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Log in</button>
+    </form>
+
+    <div class="demo-hint" style="margin-top:18px;">
+       Demo build — every seeded account uses the password <code style="font-family:var(--font-mono);">{{ demo_password }}</code>. Pick any profile on the right and use that password to sign in as them.
+    </div>
+  </div>
+
+  <div class="roster-card">
+    <div style="font-family:var(--font-mono); font-size:.72rem; text-transform:uppercase; color:var(--muted); margin-bottom:10px; letter-spacing:.05em;">20 demo profiles — click to fill the form</div>
+    <input type="text" class="roster-search" id="roster-search" placeholder="Search by name or class…" oninput="filterRoster()">
+    <div class="roster-grid" id="roster-grid">
+      {% for s in roster %}
+      <button type="button" class="roster-item" data-name="{{ s.name|lower }}" data-class="{{ s.grade }}" data-enrollment="{{ s.enrollment }}" data-color="{{ s.color }}">
+        <span class="avatar" data-color="{{ s.color }}">{{ s.initials }}</span>
+        <span>
+          <div class="rn">{{ s.name }}</div>
+          <div class="rm">{{ s.enrollment }} · Class {{ s.grade }} · {{ s.track }}</div>
+        </span>
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script id="login-data" type="application/json">{ "demo_password": {{ demo_password|tojson }} }</script>
+<script>
+    (function(){
+      var dataEl = document.getElementById('login-data');
+      try{ window.DEMO_PASSWORD = JSON.parse(dataEl && dataEl.textContent || '{}').demo_password || ''; }catch(e){ window.DEMO_PASSWORD = ''; }
+      // apply roster item colors and click handlers
+      function initRoster(){
+        document.querySelectorAll('#roster-grid .roster-item').forEach(function(btn){
+          var color = btn.getAttribute('data-color') || btn.querySelector('.avatar')?.getAttribute('data-color') || '';
+          var avatar = btn.querySelector('.avatar'); if(avatar && color) avatar.style.background = color;
+          btn.addEventListener('click', function(){
+            var enrollment = btn.getAttribute('data-enrollment') || '';
+            fillLogin(enrollment);
+          });
+        });
+      }
+      if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initRoster); else initRoster();
+    })();
+function fillLogin(enrollment){
+  document.getElementById('enrollment').value = enrollment;
+  document.getElementById('password').value = window.DEMO_PASSWORD || '';
+  document.getElementById('password').focus();
+}
+function filterRoster(){
+  const q = document.getElementById('roster-search').value.toLowerCase();
+  document.querySelectorAll('#roster-grid .roster-item').forEach(item => {
+    const match = item.dataset.name.includes(q) || ('class '+item.dataset.class).includes(q);
+    item.style.display = match ? 'flex' : 'none';
+  });
+}
+</script>
+</body>
+</html>
