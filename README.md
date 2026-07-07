@@ -1,35 +1,75 @@
-# RankVault 
+# AscentPrep — Flask backend
 
-Frontend for RankVault, a JEE/NEET chapter-practice and mock-test platform.
-Built for **Frontend Battle 2026**. Talks to the Flask JSON API in
-`../RankVault-flask/RankVault-flask/api.py` over a bearer token.
+A real backend for the platform: SQLite-backed student accounts, server-side
+login sessions, and pages that are computed per logged-in student instead of
+hard-coded.
 
-## Design system
-- **Palette:** deep exam-hall navy (`--ink`) + OMR-sheet paper cream (`--paper`)
-  + rank-card gold (`--gold`) — not the generic cream/terracotta or
-  near-black/neon AI defaults.
-- **Type:** Fraunces (display) + Inter (body) + IBM Plex Mono (scores, roll
-  numbers, timers).
-- **Signature element:** `OmrRow` — a 10-bubble answer-sheet row standing in
-  for every progress bar in the app, since the product is literally about
-  exam scoring.
+## Run it
 
-## Local dev
 ```bash
-npm install
-cp .env.example .env.local   # point NEXT_PUBLIC_API_URL at your backend
-npm run dev
+pip install -r requirements.txt
+python app.py
 ```
 
-## Deploy to Vercel
-1. Push this folder to a GitHub repo (or the monorepo root — set the
-   Vercel "Root Directory" to `rankvault-web` if so).
-2. Import the repo in Vercel → framework auto-detected as Next.js.
-3. Add an environment variable: `NEXT_PUBLIC_API_URL` = your deployed
-   Flask API URL (e.g. `https://rankvault-api.onrender.com`).
-4. Deploy. No build command changes needed.
+Then open **http://localhost:5000** — it redirects straight to the login page.
 
-## Backend
-See `../RankVault-flask/RankVault-flask/DEPLOY.md` for deploying the Flask
-API (Render recommended — free tier, persists SQLite between requests
-unlike Vercel serverless functions).
+A SQLite database is created automatically on first run at
+`instance/ascentprep.db`, seeded with 20 student accounts.
+
+## Logging in as different profiles
+
+Every seeded account uses enrollment ID + password, same as a real login:
+
+- **Enrollment ID:** e.g. `AP24-1182`
+- **Password (all 20 demo accounts):** `ascent123`
+
+The login page also lists all 20 profiles with a search box — click any card
+to auto-fill its enrollment ID, then the password is filled in for you too
+(demo convenience only; remove that in a real deployment).
+
+Once logged in, a signed session cookie (`Flask` `session`) keeps you logged
+in across pages and browser refreshes. `Log out` in the sidebar clears it.
+Every page route is wrapped in `@login_required`, which redirects to
+`/login` if there's no valid session — try opening `/dashboard` in a private
+window to see it bounce you to the login page.
+
+## What's actually personalized per student
+
+- **Dashboard & myPlan** — syllabus %, accuracy, and the "needs attention"
+  list are computed per student from `content.get_student_stats()`. It's a
+  deterministic function (same seed → same numbers every time) rather than
+  20 hand-authored datasets — swap it for a real progress-tracking table
+  whenever you wire up actual CPP/test attempts at scale.
+- **Test Engine** — submitting a test POSTs to `/api/submit-test`, which
+  grades server-side (the client never receives the answer key — check
+  `app.py`'s `test_engine()` route, which strips it before rendering) and
+  writes a row to `test_attempts`. That row is what the dashboard's
+  "Last test score" card reads back.
+- **Lectures** — watch position is POSTed to `/api/lecture-progress` every
+  few seconds and on pause/unload, stored in `lecture_progress`, and read
+  back on your next visit — so "resume where you left off" survives an
+  actual logout/login, not just a page refresh.
+
+## Project layout
+
+```
+app.py              Flask routes, auth/session, the two write APIs
+db.py                SQLite schema + queries (students, test_attempts, lecture_progress)
+content.py           Shared curriculum data (subjects, CPP bank, lectures, test questions)
+templates/           Jinja2 pages — base.html is the shared sidebar shell
+static/               CSS + the per-page JS that drives the interactive bits
+  (test-engine.js, packages.js, lectures.js, myplan.js, app.js)
+instance/             SQLite file lives here once created (gitignored)
+```
+
+## Known simplifications (this is a prototype)
+
+- The Class 9–12 selector on Study Packages is visual only — all classes
+  currently render the same Class 12 PCM content. Wiring it up for real means
+  keying `SUBJECTS`/`CPP_BANK` by grade too.
+- `get_student_stats()` is a stand-in for real progress data. It's enough to
+  prove "every login sees different numbers," but a production version
+  should compute these from actual `test_attempts` / CPP-attempt rows.
+- `SECRET_KEY` defaults to a dev value — set the `SECRET_KEY` environment
+  variable before deploying this anywhere real.
+- No password reset / signup flow — accounts are seeded once at startup.
