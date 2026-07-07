@@ -1,4 +1,4 @@
-# RankVault — Frontend (Next.js + Tailwind + Framer Motion)
+# RankVault 
 
 Frontend for RankVault, a JEE/NEET chapter-practice and mock-test platform.
 Built for **Frontend Battle 2026**. Talks to the Flask JSON API in
