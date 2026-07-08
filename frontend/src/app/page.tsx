@@ -1,254 +1,213 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Protected from "@/components/Protected";
-import OmrRow from "@/components/OmrRow";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
+import OmrRow from "@/components/OmrRow";
 
-type Chapter = {
-  id: string; name: string; status: "active" | "expired" | "upcoming";
-  accuracy: number; progress: number; cppDone: number; cppTotal: number;
-  microConcepts: { name: string; accuracy: number }[];
+type RosterEntry = {
+  id: string;
+  enrollment: string;
+  name: string;
+  grade: number;
+  track: string;
+  centre: string;
 };
-type Subject = { name: string; color: string; chapters: Chapter[] };
-type CppBank = Record<string, {
-  subjective: { id: string; marks: number; text: string }[];
-  objective: { id: string; text: string; options: string[]; answer: number; solution: string }[];
-}>;
 
-function ObjectiveQuestion({ q }: { q: CppBank[string]["objective"][number] }) {
-  const [selected, setSelected] = useState<number | null>(null);
-  const answered = selected !== null;
-  return (
-    <div className="border border-white/10 rounded-xl p-4 bg-ink">
-      <p className="text-sm mb-3">{q.text}</p>
-      <div className="grid sm:grid-cols-2 gap-2">
-        {q.options.map((opt, i) => {
-          const isCorrect = i === q.answer;
-          const isPicked = i === selected;
-          let cls = "border-white/10 text-mute hover:border-white/30";
-          if (answered && isCorrect) cls = "border-verified/60 bg-verified-soft text-[#EDEEF5]";
-          else if (answered && isPicked && !isCorrect) cls = "border-coral/60 bg-coral-soft text-[#EDEEF5]";
-          return (
-            <button
-              key={i}
-              onClick={() => setSelected(i)}
-              disabled={answered}
-              className={`text-left text-xs rounded-lg border px-3 py-2 transition-colors ${cls}`}
-            >
-              {opt}
-            </button>
-          );
-        })}
-      </div>
-      <AnimatePresence>
-        {answered && (
-          <motion.p
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="text-xs text-mute mt-3 leading-relaxed"
-          >
-            {q.solution}
-          </motion.p>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
+export default function LandingPage() {
+  const { student, loading, login } = useAuth();
+  const router = useRouter();
 
-function SubjectiveQuestion({
-  q, chapterId, practiced, onToggle,
-}: {
-  q: { id: string; marks: number; text: string };
-  chapterId: string;
-  practiced: boolean;
-  onToggle: (done: boolean) => void;
-}) {
-  return (
-    <div className="border border-white/10 rounded-xl p-4 bg-ink flex gap-3">
-      <button
-        onClick={() => onToggle(!practiced)}
-        className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center text-[10px] transition-colors ${
-          practiced ? "bg-verified border-verified text-ink" : "border-white/25 text-transparent"
-        }`}
-        aria-label={practiced ? "Marked practiced" : "Mark as practiced"}
-      >
-        ✓
-      </button>
-      <div>
-        <p className={`text-sm ${practiced ? "text-mute line-through decoration-white/20" : ""}`}>{q.text}</p>
-        <p className="text-[10px] font-mono text-gold mt-1">{q.marks} marks</p>
-      </div>
-    </div>
-  );
-}
-
-function ChapterCard({
-  chapter, subjectColor, bank, practicedSet, onTogglePracticed,
-}: {
-  chapter: Chapter;
-  subjectColor: string;
-  bank: CppBank[string] | undefined;
-  practicedSet: Set<string>;
-  onTogglePracticed: (chapterId: string, problemId: string, done: boolean) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<"subjective" | "objective">("subjective");
-  const locked = chapter.status === "upcoming";
-
-  return (
-    <div className="border border-white/10 rounded-2xl bg-ink-2 overflow-hidden">
-      <button
-        onClick={() => !locked && setOpen((o) => !o)}
-        className="w-full flex items-center justify-between gap-4 p-5 text-left"
-        disabled={locked}
-      >
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: subjectColor }} />
-          <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{chapter.name}</p>
-            <p className="text-[11px] text-mute font-mono">
-              {locked ? "Unlocks when live in class" : `${chapter.cppDone}/${chapter.cppTotal} CPP done`}
-            </p>
-          </div>
-        </div>
-        {!locked && (
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <OmrRow value={chapter.accuracy} className={chapter.accuracy >= 70 ? "text-verified" : "text-coral"} />
-            <span className="font-mono text-xs w-9 text-right text-mute">{chapter.accuracy}%</span>
-            <motion.span animate={{ rotate: open ? 180 : 0 }} className="text-mute text-xs">▾</motion.span>
-          </div>
-        )}
-      </button>
-
-      <AnimatePresence initial={false}>
-        {open && !locked && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="border-t border-white/10"
-          >
-            <div className="p-5">
-              {!bank ? (
-                <p className="text-xs text-mute">No subjective/objective set published yet for this chapter.</p>
-              ) : (
-                <>
-                  <div className="flex gap-1 mb-4">
-                    {(["subjective", "objective"] as const).map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setTab(t)}
-                        className={`text-xs font-medium px-3 py-1.5 rounded-md capitalize transition-colors ${
-                          tab === t ? "bg-ink-3 text-[#EDEEF5]" : "text-mute"
-                        }`}
-                      >
-                        {t} ({bank[t].length})
-                      </button>
-                    ))}
-                  </div>
-                  <div className="space-y-3">
-                    {tab === "subjective"
-                      ? bank.subjective.map((q) => (
-                          <SubjectiveQuestion
-                            key={q.id}
-                            q={q}
-                            chapterId={chapter.id}
-                            practiced={practicedSet.has(`${chapter.id}:${q.id}`)}
-                            onToggle={(done) => onTogglePracticed(chapter.id, q.id, done)}
-                          />
-                        ))
-                      : bank.objective.map((q) => <ObjectiveQuestion key={q.id} q={q} />)}
-                  </div>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function PackagesBody() {
-  const [subjects, setSubjects] = useState<Subject[] | null>(null);
-  const [cppBank, setCppBank] = useState<CppBank>({});
-  const [practicedSet, setPracticedSet] = useState<Set<string>>(new Set());
+  const [enrollment, setEnrollment] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [roster, setRoster] = useState<RosterEntry[]>([]);
+  const [demoPassword, setDemoPassword] = useState("");
+
+  useEffect(() => {
+    if (!loading && student) router.replace("/dashboard");
+  }, [loading, student, router]);
 
   useEffect(() => {
     api
-      .packages()
+      .roster()
       .then((res) => {
-        setSubjects(res.subjects);
-        setCppBank(res.cpp_bank);
-        setPracticedSet(new Set(res.practiced as string[]));
+        setRoster(res.roster.slice(0, 6));
+        setDemoPassword(res.demo_password);
       })
-      .catch((e) => setError(e.message));
+      .catch(() => {
+        /* API may be cold-starting on a free tier — form still works manually */
+      });
   }, []);
 
-  async function handleToggle(chapterId: string, problemId: string, done: boolean) {
-    const key = `${chapterId}:${problemId}`;
-    setPracticedSet((prev) => {
-      const next = new Set(prev);
-      if (done) next.add(key); else next.delete(key);
-      return next;
-    });
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setBusy(true);
     try {
-      await api.togglePracticed(chapterId, problemId, done);
-    } catch {
-      // best-effort — revert on failure
-      setPracticedSet((prev) => {
-        const next = new Set(prev);
-        if (done) next.delete(key); else next.add(key);
-        return next;
-      });
+      await login(enrollment, password);
+    } catch (err: any) {
+      setError(err.message || "Could not sign in. Check your enrollment ID and password.");
+    } finally {
+      setBusy(false);
     }
   }
 
-  if (error) return <p className="text-coral text-sm">{error}</p>;
-  if (!subjects) return <p className="text-mute text-sm font-mono">Loading chapter practice…</p>;
+  function quickFill(entry: RosterEntry) {
+    setEnrollment(entry.enrollment);
+    setPassword(demoPassword);
+    setError("");
+  }
 
   return (
-    <div>
-      <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-mono mb-2">Chapter Practice Problems</p>
-      <h1 className="font-display text-3xl md:text-4xl tracking-tight mb-2">
-        Every chapter, scored like the real thing.
-      </h1>
-      <p className="text-mute max-w-xl mb-8">
-        Subjective sets to work through on paper, objective sets that grade
-        themselves. Progress is saved to your account, not just this browser.
-      </p>
+    <div className="min-h-screen flex flex-col">
+      <header className="mx-auto w-full max-w-6xl px-5 pt-8 flex items-center justify-between">
+        <span className="font-display text-xl">RankVault</span>
+        <span className="text-[10px] uppercase tracking-[0.25em] text-gold font-mono border border-gold/40 rounded-full px-3 py-1">
+          Admit Card Enclosed
+        </span>
+      </header>
 
-      <div className="space-y-10">
-        {subjects.map((subj) => (
-          <div key={subj.name}>
-            <h2 className="text-xs uppercase tracking-[0.2em] font-mono text-mute mb-3">{subj.name}</h2>
-            <div className="space-y-3">
-              {subj.chapters.map((ch) => (
-                <ChapterCard
-                  key={ch.id}
-                  chapter={ch}
-                  subjectColor={subj.color}
-                  bank={cppBank[ch.id]}
-                  practicedSet={practicedSet}
-                  onTogglePracticed={handleToggle}
-                />
-              ))}
+      <main className="flex-1 mx-auto w-full max-w-6xl px-5 py-10 md:py-16 grid md:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+        {/* Left: pitch + login */}
+        <div>
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="font-display text-4xl md:text-5xl leading-[1.08] tracking-tight text-[#EDEEF5]"
+          >
+            Prep like the exam
+            <br />
+            is already scoring you.
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mt-4 text-mute text-base md:text-lg max-w-md"
+          >
+            Chapter-wise practice, full mock tests with real +4/&minus;1 marking,
+            and a syllabus map that tells you exactly which micro-concept is
+            costing you rank — built for JEE &amp; NEET aspirants.
+          </motion.p>
+
+          <motion.form
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            onSubmit={handleSubmit}
+            className="mt-8 max-w-sm bg-ink-2 border border-white/10 rounded-2xl p-6"
+          >
+            <p className="text-[11px] uppercase tracking-[0.2em] text-mute font-mono mb-4">
+              Student sign-in
+            </p>
+            <label className="block text-xs text-mute mb-1">Enrollment ID</label>
+            <input
+              value={enrollment}
+              onChange={(e) => setEnrollment(e.target.value)}
+              placeholder="AP24-1182"
+              className="w-full font-mono text-sm bg-ink border border-white/10 rounded-lg px-3 py-2.5 mb-4 outline-none focus:border-gold/60 transition-colors"
+              autoComplete="username"
+            />
+            <label className="block text-xs text-mute mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full font-mono text-sm bg-ink border border-white/10 rounded-lg px-3 py-2.5 mb-4 outline-none focus:border-gold/60 transition-colors"
+              autoComplete="current-password"
+            />
+            {error && <p className="text-coral text-xs mb-3">{error}</p>}
+            <button
+              type="submit"
+              disabled={busy}
+              className="w-full bg-gold text-ink font-semibold text-sm rounded-lg py-2.5 hover:brightness-110 transition disabled:opacity-60"
+            >
+              {busy ? "Checking hall ticket…" : "Enter exam hall"}
+            </button>
+
+            {roster.length > 0 && (
+              <div className="mt-5 pt-5 border-t border-white/10">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-mono mb-2">
+                  Or try a demo profile
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {roster.map((r) => (
+                    <button
+                      type="button"
+                      key={r.id}
+                      onClick={() => quickFill(r)}
+                      className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-ink border border-white/10 text-mute hover:text-gold hover:border-gold/40 transition-colors"
+                    >
+                      {r.name.split(" ")[0]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </motion.form>
+        </div>
+
+        {/* Right: the hall-ticket signature visual */}
+        <motion.div
+          initial={{ opacity: 0, rotate: -4, y: 30 }}
+          animate={{ opacity: 1, rotate: -2, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+          className="relative mx-auto w-full max-w-sm"
+        >
+          <div className="rounded-2xl bg-paper text-[#241C0E] shadow-2xl shadow-black/40 border border-black/5 p-6 rotate-2">
+            <div className="flex items-center justify-between border-b border-dashed border-[color:var(--rule-paper)] pb-3 mb-4">
+              <span className="font-display text-lg">Admit Card</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-mute-2">
+                RV / 2026
+              </span>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-16 h-20 rounded-md bg-[color:var(--paper-dim)] border border-black/10 flex items-center justify-center text-[9px] text-mute-2 font-mono text-center leading-tight">
+                candidate
+                <br />
+                photo
+              </div>
+              <div className="flex-1 text-sm space-y-1.5">
+                <p className="font-medium">Aarav Mehta</p>
+                <p className="font-mono text-xs text-mute-2">Roll No. AP24-1182</p>
+                <p className="font-mono text-xs text-mute-2">Track: JEE Main &amp; Advanced</p>
+                <p className="font-mono text-xs text-mute-2">Centre: Kandivali</p>
+              </div>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-dashed border-[color:var(--rule-paper)]">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-mute-2 font-mono mb-2">
+                Chapter accuracy — this week
+              </p>
+              <div className="space-y-2 text-[#241C0E]">
+                {[
+                  { name: "Rotational Mechanics", pct: 92 },
+                  { name: "Current Electricity", pct: 58 },
+                  { name: "Ionic Equilibrium", pct: 74 },
+                ].map((c) => (
+                  <div key={c.name} className="flex items-center justify-between gap-3">
+                    <span className="text-xs">{c.name}</span>
+                    <OmrRow value={c.pct} className="text-[#8A5A1E]" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
-export default function PackagesPage() {
-  return (
-    <Protected>
-      <PackagesBody />
-    </Protected>
+          <div className="absolute -bottom-4 -right-4 w-full h-full rounded-2xl bg-ink-3 -z-10 rotate-6" />
+        </motion.div>
+      </main>
+
+      <footer className="mx-auto w-full max-w-6xl px-5 pb-8 text-xs text-mute">
+        Frontend Battle 2026 submission — RankVault, an exam-prep platform for
+        JEE/NEET aspirants.
+      </footer>
+    </div>
   );
 }
