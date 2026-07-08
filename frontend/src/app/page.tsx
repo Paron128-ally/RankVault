@@ -66,9 +66,6 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col">
       <header className="mx-auto w-full max-w-6xl px-5 pt-8 flex items-center justify-between">
         <span className="font-display text-xl">RankVault</span>
-        <span className="text-[10px] uppercase tracking-[0.25em] text-gold font-mono border border-gold/40 rounded-full px-3 py-1">
-          Admit Card Enclosed
-        </span>
       </header>
 
       <main className="flex-1 mx-auto w-full max-w-6xl px-5 py-10 md:py-16 grid md:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
@@ -90,9 +87,9 @@ export default function LandingPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-4 text-mute text-base md:text-lg max-w-md"
           >
-            Chapter-wise practice, full mock tests with real +4/&minus;1 marking,
+            Chapter-wise practice, full mock tests,
             and a syllabus map that tells you exactly which micro-concept is
-            costing you rank — built for JEE &amp; NEET aspirants.
+            costing you rank — built for JEE aspirants.
           </motion.p>
 
           <motion.form
