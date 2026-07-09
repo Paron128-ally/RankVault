@@ -200,11 +200,6 @@ export default function LandingPage() {
           <div className="absolute -bottom-4 -right-4 w-full h-full rounded-2xl bg-ink-3 -z-10 rotate-6" />
         </motion.div>
       </main>
-
-      <footer className="mx-auto w-full max-w-6xl px-5 pb-8 text-xs text-mute">
-        Frontend Battle 2026 submission — RankVault, an exam-prep platform for
-        JEE/NEET aspirants.
-      </footer>
     </div>
   );
 }
