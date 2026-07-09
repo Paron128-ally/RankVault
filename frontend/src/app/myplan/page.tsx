@@ -33,11 +33,11 @@ function MyPlanBody() {
   }, []);
 
   if (error) return <p className="text-coral text-sm">{error}</p>;
-  if (!subjects) return <p className="text-mute text-sm font-mono">Mapping your syllabus…</p>;
+  if (!subjects) return <p className="text-mute text-sm font-body">Mapping your syllabus…</p>;
 
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-mono mb-2">myPlan</p>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-body mb-2">myPlan</p>
       <h1 className="font-display text-3xl md:text-4xl tracking-tight mb-2">
         The whole syllabus, one map.
       </h1>
@@ -49,14 +49,14 @@ function MyPlanBody() {
       <div className="space-y-8">
         {subjects.map((subj) => (
           <div key={subj.name}>
-            <h2 className="text-xs uppercase tracking-[0.2em] font-mono text-mute mb-3">{subj.name}</h2>
+            <h2 className="text-xs uppercase tracking-[0.2em] font-body text-mute mb-3">{subj.name}</h2>
             <div className="grid sm:grid-cols-2 gap-3">
               {subj.chapters.map((ch) => {
                 const stat = chapterStats[ch.id];
                 const isOpen = expanded === ch.id;
                 const locked = ch.status === "upcoming";
                 return (
-                  <div key={ch.id} className="border border-white/10 rounded-2xl bg-ink-2 p-4">
+                  <div key={ch.id} className="border border-black/10 rounded-2xl bg-ink-2 p-4">
                     <button
                       onClick={() => !locked && setExpanded(isOpen ? null : ch.id)}
                       disabled={locked}
@@ -69,12 +69,12 @@ function MyPlanBody() {
                       {!locked && stat && (
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <OmrRow value={stat.progress} className="text-gold" />
-                          <span className="font-mono text-[11px] text-mute w-9 text-right">{stat.progress}%</span>
+                          <span className="font-body text-[11px] text-mute w-9 text-right">{stat.progress}%</span>
                         </div>
                       )}
                     </button>
                     {isOpen && (
-                      <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                      <div className="mt-3 pt-3 border-t border-black/10 space-y-2">
                         {ch.microConcepts.map((mc) => (
                           <div key={mc.name} className="flex items-center justify-between gap-3">
                             <span className="text-xs text-mute">{mc.name}</span>
@@ -84,7 +84,7 @@ function MyPlanBody() {
                                 className={mc.accuracy >= 70 ? "text-verified" : "text-coral"}
                                 animate={false}
                               />
-                              <span className="font-mono text-[11px] text-mute w-9 text-right">{mc.accuracy}%</span>
+                              <span className="font-body text-[11px] text-mute w-9 text-right">{mc.accuracy}%</span>
                             </div>
                           </div>
                         ))}
