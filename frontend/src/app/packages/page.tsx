@@ -21,15 +21,15 @@ function ObjectiveQuestion({ q }: { q: CppBank[string]["objective"][number] }) {
   const [selected, setSelected] = useState<number | null>(null);
   const answered = selected !== null;
   return (
-    <div className="border border-white/10 rounded-xl p-4 bg-ink">
+    <div className="border border-black/10 rounded-xl p-4 bg-ink">
       <p className="text-sm mb-3">{q.text}</p>
       <div className="grid sm:grid-cols-2 gap-2">
         {q.options.map((opt, i) => {
           const isCorrect = i === q.answer;
           const isPicked = i === selected;
-          let cls = "border-white/10 text-mute hover:border-white/30";
-          if (answered && isCorrect) cls = "border-verified/60 bg-verified-soft text-[#EDEEF5]";
-          else if (answered && isPicked && !isCorrect) cls = "border-coral/60 bg-coral-soft text-[#EDEEF5]";
+          let cls = "border-black/10 text-mute hover:border-black/20";
+          if (answered && isCorrect) cls = "border-verified/60 bg-verified-soft text-deep";
+          else if (answered && isPicked && !isCorrect) cls = "border-coral/60 bg-coral-soft text-deep";
           return (
             <button
               key={i}
@@ -67,11 +67,11 @@ function SubjectiveQuestion({
   onToggle: (done: boolean) => void;
 }) {
   return (
-    <div className="border border-white/10 rounded-xl p-4 bg-ink flex gap-3">
+    <div className="border border-black/10 rounded-xl p-4 bg-ink flex gap-3">
       <button
         onClick={() => onToggle(!practiced)}
         className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center text-[10px] transition-colors ${
-          practiced ? "bg-verified border-verified text-ink" : "border-white/25 text-transparent"
+          practiced ? "bg-verified border-verified text-deep" : "border-black/15 text-transparent"
         }`}
         aria-label={practiced ? "Marked practiced" : "Mark as practiced"}
       >
@@ -79,7 +79,7 @@ function SubjectiveQuestion({
       </button>
       <div>
         <p className={`text-sm ${practiced ? "text-mute line-through decoration-white/20" : ""}`}>{q.text}</p>
-        <p className="text-[10px] font-mono text-gold mt-1">{q.marks} marks</p>
+        <p className="text-[10px] font-body text-gold mt-1">{q.marks} marks</p>
       </div>
     </div>
   );
@@ -99,7 +99,7 @@ function ChapterCard({
   const locked = chapter.status === "upcoming";
 
   return (
-    <div className="border border-white/10 rounded-2xl bg-ink-2 overflow-hidden">
+    <div className="border border-black/10 rounded-2xl bg-ink-2 overflow-hidden">
       <button
         onClick={() => !locked && setOpen((o) => !o)}
         className="w-full flex items-center justify-between gap-4 p-5 text-left"
@@ -109,7 +109,7 @@ function ChapterCard({
           <span className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: subjectColor }} />
           <div className="min-w-0">
             <p className="text-sm font-medium truncate">{chapter.name}</p>
-            <p className="text-[11px] text-mute font-mono">
+            <p className="text-[11px] text-mute font-body">
               {locked ? "Unlocks when live in class" : `${chapter.cppDone}/${chapter.cppTotal} CPP done`}
             </p>
           </div>
@@ -117,7 +117,7 @@ function ChapterCard({
         {!locked && (
           <div className="flex items-center gap-3 flex-shrink-0">
             <OmrRow value={chapter.accuracy} className={chapter.accuracy >= 70 ? "text-verified" : "text-coral"} />
-            <span className="font-mono text-xs w-9 text-right text-mute">{chapter.accuracy}%</span>
+            <span className="font-body text-xs w-9 text-right text-mute">{chapter.accuracy}%</span>
             <motion.span animate={{ rotate: open ? 180 : 0 }} className="text-mute text-xs">▾</motion.span>
           </div>
         )}
@@ -129,7 +129,7 @@ function ChapterCard({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="border-t border-white/10"
+            className="border-t border-black/10"
           >
             <div className="p-5">
               {!bank ? (
@@ -142,7 +142,7 @@ function ChapterCard({
                         key={t}
                         onClick={() => setTab(t)}
                         className={`text-xs font-medium px-3 py-1.5 rounded-md capitalize transition-colors ${
-                          tab === t ? "bg-ink-3 text-[#EDEEF5]" : "text-mute"
+                          tab === t ? "bg-ink-3 text-deep" : "text-mute"
                         }`}
                       >
                         {t} ({bank[t].length})
@@ -209,11 +209,11 @@ function PackagesBody() {
   }
 
   if (error) return <p className="text-coral text-sm">{error}</p>;
-  if (!subjects) return <p className="text-mute text-sm font-mono">Loading chapter practice…</p>;
+  if (!subjects) return <p className="text-mute text-sm font-body">Loading chapter practice…</p>;
 
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-mono mb-2">Chapter Practice Problems</p>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-body mb-2">Chapter Practice Problems</p>
       <h1 className="font-display text-3xl md:text-4xl tracking-tight mb-2">
         Every chapter, scored like the real thing.
       </h1>
@@ -225,7 +225,7 @@ function PackagesBody() {
       <div className="space-y-10">
         {subjects.map((subj) => (
           <div key={subj.name}>
-            <h2 className="text-xs uppercase tracking-[0.2em] font-mono text-mute mb-3">{subj.name}</h2>
+            <h2 className="text-xs uppercase tracking-[0.2em] font-body text-mute mb-3">{subj.name}</h2>
             <div className="space-y-3">
               {subj.chapters.map((ch) => (
                 <ChapterCard
