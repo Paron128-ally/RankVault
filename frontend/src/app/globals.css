@@ -19,7 +19,9 @@
   --mute-2: #746C57;       /* muted text on paper                         */
   --rule: rgba(20, 23, 31, 0.12);
   --rule-paper: rgba(15, 24, 48, 0.12);
-
+  --nav-bg: #14171F;       /* dark navbar background */
+  --nav-active: #232733;   /* active/hover tab on dark navbar */
+  --nav-mute: #9CA3AF;     /* muted text on dark navbar */
   --font-display: "Fraunces", "Times New Roman", serif;
   --font-body: "Inter", system-ui, sans-serif;
 }
@@ -38,6 +40,9 @@
   --color-mute-2: var(--mute-2);
   --font-display: var(--font-display);
   --font-body: var(--font-body);
+  --color-nav-bg: var(--nav-bg);
+--color-nav-active: var(--nav-active);
+--color-nav-mute: var(--nav-mute);
 }
 
 * {
