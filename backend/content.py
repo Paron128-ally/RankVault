@@ -255,7 +255,7 @@ ENGINE_QUESTIONS = [
     {"id": 10, "subject": "Physics", "text": "A ball is thrown vertically upward. The acceleration during its upward and downward motion is:", "options": ["Upward in both cases", "Downward in both cases", "Upward then downward", "Zero throughout"], "answer": 0},
 ]
 
-CURRENT_TEST_NAME = "PCM Part Test — Electrostatics & Ionic Equilibrium"
+CURRENT_TEST_NAME = "PCM Part Test"
 CURRENT_TEST_DURATION_SEC = 90 * 60
 
 
