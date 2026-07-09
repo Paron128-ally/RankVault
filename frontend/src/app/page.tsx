@@ -66,6 +66,9 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col">
       <header className="mx-auto w-full max-w-6xl px-5 pt-8 flex items-center justify-between">
         <span className="font-display text-xl">RankVault</span>
+        <span className="text-[10px] uppercase tracking-[0.25em] text-gold font-body border border-gold/40 rounded-full px-3 py-1">
+          Admit Card Enclosed
+        </span>
       </header>
 
       <main className="flex-1 mx-auto w-full max-w-6xl px-5 py-10 md:py-16 grid md:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
@@ -75,7 +78,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="font-display text-4xl md:text-5xl leading-[1.08] tracking-tight text-[#EDEEF5]"
+            className="font-display text-4xl md:text-5xl leading-[1.08] tracking-tight text-deep"
           >
             Prep like the exam
             <br />
@@ -87,7 +90,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-4 text-mute text-base md:text-lg max-w-md"
           >
-            Chapter-wise practice, full mock tests,
+            Chapter-wise practice, full mock tests with real +4/&minus;1 marking,
             and a syllabus map that tells you exactly which micro-concept is
             costing you rank — built for JEE aspirants.
           </motion.p>
@@ -97,9 +100,9 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             onSubmit={handleSubmit}
-            className="mt-8 max-w-sm bg-ink-2 border border-white/10 rounded-2xl p-6"
+            className="mt-8 max-w-sm bg-ink-2 border border-black/10 rounded-2xl p-6"
           >
-            <p className="text-[11px] uppercase tracking-[0.2em] text-mute font-mono mb-4">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-mute font-body mb-4">
               Student sign-in
             </p>
             <label className="block text-xs text-mute mb-1">Enrollment ID</label>
@@ -107,7 +110,7 @@ export default function LandingPage() {
               value={enrollment}
               onChange={(e) => setEnrollment(e.target.value)}
               placeholder="AP24-1182"
-              className="w-full font-mono text-sm bg-ink border border-white/10 rounded-lg px-3 py-2.5 mb-4 outline-none focus:border-gold/60 transition-colors"
+              className="w-full font-body text-sm bg-ink border border-black/10 rounded-lg px-3 py-2.5 mb-4 outline-none focus:border-gold/60 transition-colors"
               autoComplete="username"
             />
             <label className="block text-xs text-mute mb-1">Password</label>
@@ -116,21 +119,21 @@ export default function LandingPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full font-mono text-sm bg-ink border border-white/10 rounded-lg px-3 py-2.5 mb-4 outline-none focus:border-gold/60 transition-colors"
+              className="w-full font-body text-sm bg-ink border border-black/10 rounded-lg px-3 py-2.5 mb-4 outline-none focus:border-gold/60 transition-colors"
               autoComplete="current-password"
             />
             {error && <p className="text-coral text-xs mb-3">{error}</p>}
             <button
               type="submit"
               disabled={busy}
-              className="w-full bg-gold text-ink font-semibold text-sm rounded-lg py-2.5 hover:brightness-110 transition disabled:opacity-60"
+              className="w-full bg-gold text-deep font-semibold text-sm rounded-lg py-2.5 hover:brightness-110 transition disabled:opacity-60"
             >
               {busy ? "Checking hall ticket…" : "Enter exam hall"}
             </button>
 
             {roster.length > 0 && (
-              <div className="mt-5 pt-5 border-t border-white/10">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-mono mb-2">
+              <div className="mt-5 pt-5 border-t border-black/10">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-body mb-2">
                   Or try a demo profile
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -139,7 +142,7 @@ export default function LandingPage() {
                       type="button"
                       key={r.id}
                       onClick={() => quickFill(r)}
-                      className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-ink border border-white/10 text-mute hover:text-gold hover:border-gold/40 transition-colors"
+                      className="text-[11px] font-body px-2.5 py-1 rounded-md bg-ink border border-black/10 text-mute hover:text-gold hover:border-gold/40 transition-colors"
                     >
                       {r.name.split(" ")[0]}
                     </button>
@@ -160,26 +163,26 @@ export default function LandingPage() {
           <div className="rounded-2xl bg-paper text-[#241C0E] shadow-2xl shadow-black/40 border border-black/5 p-6 rotate-2">
             <div className="flex items-center justify-between border-b border-dashed border-[color:var(--rule-paper)] pb-3 mb-4">
               <span className="font-display text-lg">Admit Card</span>
-              <span className="text-[10px] font-mono uppercase tracking-widest text-mute-2">
+              <span className="text-[10px] font-body uppercase tracking-widest text-mute-2">
                 RV / 2026
               </span>
             </div>
             <div className="flex gap-4">
-              <div className="w-16 h-20 rounded-md bg-[color:var(--paper-dim)] border border-black/10 flex items-center justify-center text-[9px] text-mute-2 font-mono text-center leading-tight">
+              <div className="w-16 h-20 rounded-md bg-[color:var(--paper-dim)] border border-black/10 flex items-center justify-center text-[9px] text-mute-2 font-body text-center leading-tight">
                 candidate
                 <br />
                 photo
               </div>
               <div className="flex-1 text-sm space-y-1.5">
                 <p className="font-medium">Aarav Mehta</p>
-                <p className="font-mono text-xs text-mute-2">Roll No. AP24-1182</p>
-                <p className="font-mono text-xs text-mute-2">Track: JEE Main &amp; Advanced</p>
-                <p className="font-mono text-xs text-mute-2">Centre: Kandivali</p>
+                <p className="font-body text-xs text-mute-2">Roll No. AP24-1182</p>
+                <p className="font-body text-xs text-mute-2">Track: JEE Main &amp; Advanced</p>
+                <p className="font-body text-xs text-mute-2">Centre: Kandivali</p>
               </div>
             </div>
 
             <div className="mt-5 pt-4 border-t border-dashed border-[color:var(--rule-paper)]">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-mute-2 font-mono mb-2">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-mute-2 font-body mb-2">
                 Chapter accuracy — this week
               </p>
               <div className="space-y-2 text-[#241C0E]">
@@ -200,6 +203,7 @@ export default function LandingPage() {
           <div className="absolute -bottom-4 -right-4 w-full h-full rounded-2xl bg-ink-3 -z-10 rotate-6" />
         </motion.div>
       </main>
+
     </div>
   );
 }
