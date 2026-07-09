@@ -17,11 +17,11 @@ export default function Nav() {
   const { student, logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-black/10 bg-ink/90 backdrop-blur">
       <div className="mx-auto max-w-6xl px-5">
         <div className="flex items-center justify-between h-16">
           <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
-            <span className="font-display text-xl tracking-tight text-[#EDEEF5]">
+            <span className="font-display text-xl tracking-tight text-deep">
               RankVault
             </span>
           </Link>
@@ -35,8 +35,8 @@ export default function Nav() {
                   href={l.href}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     active
-                      ? "bg-ink-3 text-[#EDEEF5]"
-                      : "text-mute hover:text-[#EDEEF5]"
+                      ? "bg-ink-3 text-deep"
+                      : "text-mute hover:text-deep"
                   }`}
                 >
                   {l.label}
@@ -48,15 +48,15 @@ export default function Nav() {
           <div className="flex items-center gap-3">
             {student && (
               <div className="hidden sm:flex flex-col items-end leading-tight">
-                <span className="text-xs text-[#EDEEF5]">{student.name}</span>
-                <span className="text-[10px] font-mono text-mute">
+                <span className="text-xs text-deep">{student.name}</span>
+                <span className="text-[10px] font-body text-mute">
                   {student.enrollment}
                 </span>
               </div>
             )}
             <button
               onClick={logout}
-              className="text-xs font-medium text-mute hover:text-coral border border-white/10 hover:border-coral/40 rounded-md px-3 py-1.5 transition-colors"
+              className="text-xs font-medium text-mute hover:text-coral border border-black/10 hover:border-coral/40 rounded-md px-3 py-1.5 transition-colors"
             >
               Log out
             </button>
@@ -71,7 +71,7 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
-                  active ? "bg-ink-3 text-[#EDEEF5]" : "text-mute"
+                  active ? "bg-ink-3 text-deep" : "text-mute"
                 }`}
               >
                 {l.label}
