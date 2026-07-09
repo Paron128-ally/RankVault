@@ -24,9 +24,6 @@ export default function Nav() {
             <span className="font-display text-xl tracking-tight text-[#EDEEF5]">
               RankVault
             </span>
-            <span className="hidden sm:inline text-[10px] uppercase tracking-[0.2em] text-gold font-mono border border-gold/40 rounded-full px-2 py-0.5">
-              Hall Pass
-            </span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
