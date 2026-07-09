@@ -15,7 +15,7 @@ export default function Protected({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-mute font-mono text-sm">
+      <div className="min-h-screen flex items-center justify-center text-mute font-body text-sm">
         Issuing hall ticket…
       </div>
     );
