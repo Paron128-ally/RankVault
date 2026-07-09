@@ -3,9 +3,9 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 
 export const metadata: Metadata = {
-  title: "RankVault — JEE/NEET Prep, Scored Like Exam Day",
+  title: "RankVault — JEE Prep, Scored Like Exam Day",
   description:
-    "Chapter practice, mock tests and progress tracking for JEE & NEET aspirants — designed around how the exam actually scores you.",
+    "Chapter practice, mock tests and progress tracking for JEE aspirants — designed around how the exam actually scores you.",
 };
 
 export default function RootLayout({
