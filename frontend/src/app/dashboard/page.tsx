@@ -18,8 +18,8 @@ type DashboardData = {
 
 function StatCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
-    <div className="bg-ink-2 border border-white/10 rounded-2xl p-5">
-      <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-mono mb-2">{label}</p>
+    <div className="bg-ink-2 border border-black/10 rounded-2xl p-5">
+      <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-body mb-2">{label}</p>
       <p className="font-display text-3xl" style={accent ? { color: accent } : undefined}>
         {value}
       </p>
@@ -44,13 +44,13 @@ function DashboardBody() {
     return <p className="text-coral text-sm">{error}</p>;
   }
   if (!data) {
-    return <p className="text-mute text-sm font-mono">Fetching your scoreboard…</p>;
+    return <p className="text-mute text-sm font-body">Fetching your scoreboard…</p>;
   }
 
   return (
     <div>
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-mono mb-2">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-body mb-2">
           Welcome back
         </p>
         <h1 className="font-display text-3xl md:text-4xl tracking-tight">
@@ -72,8 +72,8 @@ function DashboardBody() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 mt-8">
-        <div className="bg-ink-2 border border-white/10 rounded-2xl p-6">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-mono mb-4">
+        <div className="bg-ink-2 border border-black/10 rounded-2xl p-6">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-body mb-4">
             Weakest chapters right now
           </p>
           <div className="space-y-4">
@@ -85,7 +85,7 @@ function DashboardBody() {
                 </div>
                 <div className="flex items-center gap-2">
                   <OmrRow value={c.accuracy} className="text-coral" />
-                  <span className="font-mono text-xs text-coral w-9 text-right">{c.accuracy}%</span>
+                  <span className="font-body text-xs text-coral w-9 text-right">{c.accuracy}%</span>
                 </div>
               </div>
             ))}
@@ -98,22 +98,22 @@ function DashboardBody() {
           </Link>
         </div>
 
-        <div className="bg-ink-2 border border-white/10 rounded-2xl p-6 flex flex-col">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-mono mb-4">
+        <div className="bg-ink-2 border border-black/10 rounded-2xl p-6 flex flex-col">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-mute font-body mb-4">
             Upcoming test
           </p>
           <p className="font-display text-xl leading-snug">{data.test_name}</p>
           <p className="text-xs text-mute mt-2">Marking: +4 correct / −1 incorrect, NTA pattern.</p>
           {data.last_attempt ? (
-            <p className="text-xs text-mute mt-3 font-mono">
+            <p className="text-xs text-mute mt-3 font-body">
               Last attempt: {data.last_attempt.score}/{data.last_attempt.max_score}
             </p>
           ) : (
-            <p className="text-xs text-mute mt-3 font-mono">No attempts yet.</p>
+            <p className="text-xs text-mute mt-3 font-body">No attempts yet.</p>
           )}
           <Link
             href="/test"
-            className="mt-auto inline-block text-center bg-gold text-ink font-semibold text-sm rounded-lg py-2.5 hover:brightness-110 transition mt-5"
+            className="mt-auto inline-block text-center bg-gold text-deep font-semibold text-sm rounded-lg py-2.5 hover:brightness-110 transition mt-5"
           >
             Start test
           </Link>
