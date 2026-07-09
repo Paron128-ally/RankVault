@@ -75,16 +75,16 @@ function TestBody() {
   if (phase === "intro") {
     return (
       <div className="max-w-lg">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-mono mb-2">Test Engine</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-body mb-2">Test Engine</p>
         <h1 className="font-display text-3xl md:text-4xl tracking-tight mb-3">{testName || "Loading test…"}</h1>
-        <div className="bg-ink-2 border border-white/10 rounded-2xl p-5 space-y-2 text-sm text-mute">
+        <div className="bg-ink-2 border border-black/10 rounded-2xl p-5 space-y-2 text-sm text-mute">
           <p>{questions.length} questions · {formatTime(duration)} duration</p>
-          <p>Marking scheme: <span className="text-verified font-mono">+4</span> correct, <span className="text-coral font-mono">−1</span> incorrect, 0 unattempted.</p>
+          <p>Marking scheme: <span className="text-verified font-body">+4</span> correct, <span className="text-coral font-body">−1</span> incorrect, 0 unattempted.</p>
         </div>
         <button
           onClick={startTest}
           disabled={questions.length === 0}
-          className="mt-5 bg-gold text-ink font-semibold text-sm rounded-lg px-6 py-2.5 hover:brightness-110 transition disabled:opacity-60"
+          className="mt-5 bg-gold text-deep font-semibold text-sm rounded-lg px-6 py-2.5 hover:brightness-110 transition disabled:opacity-60"
         >
           Begin test
         </button>
@@ -99,13 +99,13 @@ function TestBody() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-mute">Question {current + 1} of {questions.length}</p>
-          <span className={`font-mono text-sm px-3 py-1 rounded-full border ${timeLeft < 60 ? "border-coral text-coral" : "border-white/10 text-mute"}`}>
+          <span className={`font-body text-sm px-3 py-1 rounded-full border ${timeLeft < 60 ? "border-coral text-coral" : "border-black/10 text-mute"}`}>
             {formatTime(timeLeft)}
           </span>
         </div>
 
-        <div className="bg-ink-2 border border-white/10 rounded-2xl p-6 max-w-xl">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-mono mb-3">{q.subject}</p>
+        <div className="bg-ink-2 border border-black/10 rounded-2xl p-6 max-w-xl">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-body mb-3">{q.subject}</p>
           <p className="text-sm md:text-base mb-5">{q.text}</p>
           <div className="space-y-2">
             {q.options.map((opt, i) => {
@@ -115,7 +115,7 @@ function TestBody() {
                   key={i}
                   onClick={() => setAnswers((a) => ({ ...a, [String(q.id)]: i }))}
                   className={`w-full text-left text-sm rounded-lg border px-4 py-2.5 transition-colors ${
-                    picked ? "border-gold bg-gold-soft text-[#EDEEF5]" : "border-white/10 text-mute hover:border-white/30"
+                    picked ? "border-gold bg-gold-soft text-deep" : "border-black/10 text-mute hover:border-black/20"
                   }`}
                 >
                   {opt}
@@ -133,13 +133,13 @@ function TestBody() {
           >
             ← Previous
           </button>
-          <span className="text-[11px] font-mono text-mute">{answeredCount}/{questions.length} answered</span>
+          <span className="text-[11px] font-body text-mute">{answeredCount}/{questions.length} answered</span>
           {current < questions.length - 1 ? (
             <button onClick={() => setCurrent((c) => c + 1)} className="text-xs text-gold font-semibold">
               Next →
             </button>
           ) : (
-            <button onClick={handleSubmit} className="text-xs bg-gold text-ink font-semibold rounded-md px-4 py-1.5">
+            <button onClick={handleSubmit} className="text-xs bg-gold text-deep font-semibold rounded-md px-4 py-1.5">
               Submit test
             </button>
           )}
@@ -152,8 +152,8 @@ function TestBody() {
               <button
                 key={qq.id}
                 onClick={() => setCurrent(i)}
-                className={`w-7 h-7 rounded-md text-[11px] font-mono border transition-colors ${
-                  i === current ? "border-gold text-gold" : done ? "border-verified/50 text-verified" : "border-white/10 text-mute"
+                className={`w-7 h-7 rounded-md text-[11px] font-body border transition-colors ${
+                  i === current ? "border-gold text-gold" : done ? "border-verified/50 text-verified" : "border-black/10 text-mute"
                 }`}
               >
                 {i + 1}
@@ -168,29 +168,29 @@ function TestBody() {
   if (phase === "result" && result) {
     return (
       <div className="max-w-2xl">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-mono mb-2">Result</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-body mb-2">Result</p>
         <h1 className="font-display text-4xl tracking-tight mb-6">
           {result.score} <span className="text-mute text-2xl">/ {result.max_score}</span>
         </h1>
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="bg-ink-2 border border-white/10 rounded-xl p-4 text-center">
+          <div className="bg-ink-2 border border-black/10 rounded-xl p-4 text-center">
             <p className="text-2xl font-display text-verified">{result.correct}</p>
-            <p className="text-[10px] uppercase tracking-widest text-mute font-mono mt-1">Correct</p>
+            <p className="text-[10px] uppercase tracking-widest text-mute font-body mt-1">Correct</p>
           </div>
-          <div className="bg-ink-2 border border-white/10 rounded-xl p-4 text-center">
+          <div className="bg-ink-2 border border-black/10 rounded-xl p-4 text-center">
             <p className="text-2xl font-display text-coral">{result.incorrect}</p>
-            <p className="text-[10px] uppercase tracking-widest text-mute font-mono mt-1">Incorrect</p>
+            <p className="text-[10px] uppercase tracking-widest text-mute font-body mt-1">Incorrect</p>
           </div>
-          <div className="bg-ink-2 border border-white/10 rounded-xl p-4 text-center">
+          <div className="bg-ink-2 border border-black/10 rounded-xl p-4 text-center">
             <p className="text-2xl font-display text-mute">{result.unattempted}</p>
-            <p className="text-[10px] uppercase tracking-widest text-mute font-mono mt-1">Skipped</p>
+            <p className="text-[10px] uppercase tracking-widest text-mute font-body mt-1">Skipped</p>
           </div>
         </div>
 
-        <p className="text-xs uppercase tracking-[0.2em] text-mute font-mono mb-3">Review</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-mute font-body mb-3">Review</p>
         <div className="space-y-3">
           {result.review.map((r) => (
-            <div key={r.id} className="border border-white/10 rounded-xl p-4 bg-ink-2">
+            <div key={r.id} className="border border-black/10 rounded-xl p-4 bg-ink-2">
               <p className="text-sm mb-2">{r.text}</p>
               <div className="flex flex-wrap gap-2 text-xs">
                 {r.options.map((opt, i) => {
