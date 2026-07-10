@@ -1,15 +1,3 @@
-# ===========================================================
-# RankVault — JSON API for the decoupled Next.js frontend
-# Run:  pip install -r requirements.txt && python api.py
-# Then: http://localhost:5001/api/...
-#
-# Auth: simple bearer token, issued on login, checked against
-# the auth_tokens table (see db.py). This trades strict best
-# practice (short-lived JWTs, refresh tokens, httpOnly cookies)
-# for something a judge can actually click through in a demo —
-# the frontend stores the token in localStorage and sends it
-# as `Authorization: Bearer <token>`.
-# ===========================================================
 import os
 from functools import wraps
 from flask import Flask, request, jsonify
@@ -32,7 +20,7 @@ CORS(app, resources={r"/api/*": {"origins": FRONTEND_ORIGIN}}, supports_credenti
 db.init_db()
 
 
-# ---------- Auth helpers --------------------------------------------------
+#Auth helpers
 def current_student_id():
     auth = request.headers.get("Authorization", "")
     token = auth[7:] if auth.startswith("Bearer ") else None
@@ -49,7 +37,7 @@ def token_required(view):
     return wrapped
 
 
-# ---------- Auth routes ---------------------------------------------------
+#Auth routes
 @app.route("/api/auth/roster", methods=["GET"])
 def roster():
     """Public: lets the login screen offer quick-login options, like the Jinja version did."""
@@ -86,7 +74,7 @@ def me(sid):
     return jsonify({"student": db.get_student_by_id(sid)})
 
 
-# ---------- Dashboard -------------------------------------------------------
+#Dashboard
 @app.route("/api/dashboard", methods=["GET"])
 @token_required
 def dashboard(sid):
@@ -100,7 +88,7 @@ def dashboard(sid):
     })
 
 
-# ---------- Packages (CPP) --------------------------------------------------
+#Packages (CPP)
 @app.route("/api/packages", methods=["GET"])
 @token_required
 def packages(sid):
@@ -127,7 +115,7 @@ def toggle_practiced(sid):
     return jsonify({"ok": True, "practiced": sorted(db.get_practiced_set(sid))})
 
 
-# ---------- Lectures ---------------------------------------------------------
+#ectures
 @app.route("/api/lectures", methods=["GET"])
 @token_required
 def lectures(sid):
@@ -152,7 +140,7 @@ def save_lecture_progress(sid):
     return jsonify({"ok": True})
 
 
-# ---------- myPlan (syllabus map) -------------------------------------------
+#myPlan
 @app.route("/api/myplan", methods=["GET"])
 @token_required
 def myplan(sid):
@@ -160,7 +148,7 @@ def myplan(sid):
     return jsonify({"subjects": ct.SUBJECTS, "stats": stats})
 
 
-# ---------- Test engine -------------------------------------------------------
+#Test engine
 @app.route("/api/test-engine", methods=["GET"])
 @token_required
 def test_engine(sid):
@@ -212,7 +200,7 @@ def test_history(sid):
     return jsonify({"history": db.get_attempt_history(sid)})
 
 
-# ---------- Health check (useful for Render/Railway) ------------------------
+#Health check (useful for Render/Railway)
 @app.route("/api/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})
