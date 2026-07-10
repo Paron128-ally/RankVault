@@ -1,9 +1,3 @@
-/* ===========================================================
-   AscentPrep — exam mode stylesheet
-   Deliberately breaks from the warm "notebook paper" look used
-   elsewhere: this page should feel like sitting the real
-   computer-based test, not like studying from a booklet.
-=========================================================== */
 :root{
   --exam-bg:#EEF0F4;
   --exam-header:#16213A;
