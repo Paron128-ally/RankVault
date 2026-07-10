@@ -1,9 +1,3 @@
-# ===========================================================
-# AscentPrep — SQLite data access layer
-# Real student rows with hashed passwords, and a table that
-# persists test attempts across logins (the actual payoff of
-# having a backend instead of just a client-side profile switch).
-# ===========================================================
 import sqlite3
 from pathlib import Path
 from werkzeug.security import generate_password_hash
@@ -178,7 +172,7 @@ def get_all_students():
     return [dict(r) for r in rows]
 
 
-# ---------- Token auth (for the JSON API / decoupled frontend) -----------
+#Token auth (for the JSON API / decoupled frontend)
 def create_token(student_id: str) -> str:
     import secrets
     token = secrets.token_urlsafe(32)
@@ -205,7 +199,7 @@ def delete_token(token: str):
     conn.close()
 
 
-# ---------- CPP subjective "marked practiced" persistence -----------------
+#CPP subjective "marked practiced" persistence
 def get_practiced_set(student_id: str) -> set:
     conn = get_conn()
     rows = conn.execute(
