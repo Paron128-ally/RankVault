@@ -1,13 +1,6 @@
-# ===========================================================
-# AscentPrep — shared curriculum content + student roster
-# This is the "data layer" in plain Python so app.py can stay
-# focused on routing, auth and persistence (db.py).
-# ===========================================================
+
 import math
 
-# ---------- Student roster -----------------------------------------------
-# Real fields live in the DB (db.py); this module only carries the
-# values that aren't student-editable secrets (no passwords here).
 STUDENT_SEED_ORDER = [
     "stu01", "stu02", "stu03", "stu04", "stu05", "stu06", "stu07", "stu08",
     "stu09", "stu10", "stu11", "stu12", "stu13", "stu14", "stu15", "stu16",
@@ -34,7 +27,7 @@ def seeded(seed: int, lo: int, hi: int) -> int:
     return round(lo + r * (hi - lo))
 
 
-# ---------- Curriculum: subjects / chapters / micro-concepts -------------
+#Curriculum: subjects / chapters / micro-concepts
 SUBJECTS = [
     {
         "id": "phy", "name": "Physics", "color": "#2F6F8F",
@@ -84,7 +77,7 @@ SUBJECTS = [
 ALL_CHAPTERS = {ch["id"]: {**ch, "subject": s["name"], "subjectColor": s["color"]}
                 for s in SUBJECTS for ch in s["chapters"]}
 
-# ---------- Lectures / Tests / Workbooks ----------------------------------
+#Lectures / Tests / Workbooks
 
 LECTURES = [
     {"id": "m1", "youtube_url": "https://www.youtube.com/watch?v=nf6EA9sLiwk", "subject": "Mathematics", "chapter": "Coordinate Geometry", "title": "Circle", "faculty": "Arvind Kalia", "duration": "4:40:50", "watched": 0, "recordedOn": "20 Jun 2026"},
@@ -117,7 +110,7 @@ WORKBOOKS = [
     {"id": "w4", "subject": "Mathematics", "chapter": "Definite Integration", "title": "Workbook 6 — Properties & Reduction Formulae", "questions": 30, "pages": 13, "unlockedAfter": "Lecture 49 of 2026-06-08"},
 ]
 
-# ---------- CPP bank: subjective worksheets + objective auto-graded quiz --
+#  CPP bank: subjective worksheets + objective auto-graded quiz 
 CPP_BANK = {
     "rot-mech": {
         "subjective": [
@@ -241,7 +234,7 @@ CPP_BANK = {
     },
 }
 
-# ---------- Test Engine question bank (NTA pattern: +4 / −1) --------------
+#Test Engine question bank (NTA pattern: +4 / −1)
 ENGINE_QUESTIONS = [
     {"id": 1, "subject": "Physics", "text": "A particle moves in a circle of radius R with constant angular velocity ω. The magnitude of its average velocity over one complete revolution is:", "options": ["ωR", "2ωR", "πωR", "Zero"], "answer": 3},
     {"id": 2, "subject": "Physics", "text": "Two capacitors of 4 μF and 6 μF are connected in series across a 100 V supply. The charge on each capacitor is:", "options": ["240 μC", "400 μC", "600 μC", "1000 μC"], "answer": 0},
@@ -259,9 +252,8 @@ CURRENT_TEST_NAME = "PCM Part Test"
 CURRENT_TEST_DURATION_SEC = 90 * 60
 
 
-# ---------- Per-student deterministic performance overlay -----------------
+#Per-student deterministic performance overlay 
 def get_student_stats(student_row_id: str) -> dict:
-    """student_row_id is the DB primary key, e.g. 'stu07'."""
     try:
         idx = STUDENT_SEED_ORDER.index(student_row_id)
     except ValueError:
