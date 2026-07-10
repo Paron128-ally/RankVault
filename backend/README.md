@@ -1,4 +1,4 @@
-# AscentPrep — Flask backend
+# RankVault — Flask backend
 
 A real backend for the platform: SQLite-backed student accounts, server-side
 login sessions, and pages that are computed per logged-in student instead of
@@ -14,7 +14,7 @@ python app.py
 Then open **http://localhost:5000** — it redirects straight to the login page.
 
 A SQLite database is created automatically on first run at
-`instance/ascentprep.db`, seeded with 20 student accounts.
+`instance/rankvault.db`, seeded with 20 student accounts.
 
 ## Logging in as different profiles
 
