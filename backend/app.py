@@ -1,8 +1,3 @@
-# ===========================================================
-# RankVault — Flask backend
-# Run:  pip install -r requirements.txt && python app.py
-# Then: http://localhost:5000
-# ===========================================================
 import os
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
@@ -24,7 +19,7 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 db.init_db()
 
 
-# ---------- Auth helpers --------------------------------------------------
+# Auth helpers
 def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
@@ -59,7 +54,7 @@ def inject_student():
     return {"student": student, "streak": streak}
 
 
-# ---------- Auth routes ---------------------------------------------------
+#Auth routes
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_student():
@@ -93,7 +88,7 @@ def logout():
     return redirect(url_for("login"))
 
 
-# ---------- App Workspace Module Routing ----------------------------------
+#App Workspace Module Routing
 @app.route("/")
 @app.route("/dashboard")
 @login_required
